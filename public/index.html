@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FormDraft</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #f4f6f8;
+      color: #222;
+    }
+
+    .container {
+      max-width: 850px;
+      margin: 40px auto;
+      padding: 20px;
+    }
+
+    h1 {
+      margin-bottom: 5px;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 25px;
+    }
+
+    .card {
+      background: white;
+      padding: 25px;
+      border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      margin-bottom: 6px;
+      font-weight: bold;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 11px;
+      border: 1px solid #ccc;
+      border-radius: 7px;
+      font-size: 15px;
+    }
+
+    textarea {
+      min-height: 90px;
+      resize: vertical;
+    }
+
+    button {
+      margin-top: 20px;
+      width: 100%;
+      padding: 13px;
+      border: none;
+      border-radius: 7px;
+      background: #222;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      opacity: 0.9;
+    }
+
+    #result {
+      white-space: pre-wrap;
+      line-height: 1.6;
+      min-height: 150px;
+    }
+
+    .loading {
+      color: #777;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="container">
+
+    <h1>FormDraft</h1>
+    <p class="subtitle">
+      Create clear letters and requests with local AI.
+    </p>
+
+    <div class="card">
+
+      <label for="documentType">Document Type</label>
+      <select id="documentType">
+        <option>Request Letter</option>
+        <option>Excuse Letter</option>
+        <option>Application</option>
+        <option>Permission Letter</option>
+        <option>Complaint</option>
+        <option>School Letter</option>
+        <option>Business Request</option>
+        <option>Recommendation Request</option>
+        <option>Other</option>
+      </select>
+
+      <label for="recipient">Recipient</label>
+      <input id="recipient" placeholder="Example: School Principal">
+
+      <label for="purpose">Purpose</label>
+      <input id="purpose" placeholder="What is the letter for?">
+
+      <label for="reason">Reason</label>
+      <textarea id="reason" placeholder="Explain the reason..."></textarea>
+
+      <label for="date">Date</label>
+      <input id="date" placeholder="Example: September 20, 2026">
+
+      <label for="details">Additional Details</label>
+      <textarea id="details" placeholder="Add any other important information..."></textarea>
+
+      <button onclick="generateDraft()">Generate Draft</button>
+<button onclick="copyDraft()">Copy Draft</button>
+
+    </div>
+
+    <div class="card">
+      <h2>Generated Draft</h2>
+      <div id="result">Your generated document will appear here.</div>
+    </div>
+
+  </div>
+
+  <script>
+    async function generateDraft() {
+  const result = document.getElementById("result");
+
+  result.textContent = "Generating with QVAC...";
+  result.className = "loading";
+
+  const data = {
+    documentType: document.getElementById("documentType").value,
+    recipient: document.getElementById("recipient").value,
+    purpose: document.getElementById("purpose").value,
+    reason: document.getElementById("reason").value,
+    date: document.getElementById("date").value,
+    details: document.getElementById("details").value
+  };
+
+  try {
+    const response = await fetch("/generate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(data)
+    });
+
+    const resultData = await response.json();
+
+    if (!response.ok) {
+      throw new Error(resultData.error);
+    }
+
+    result.textContent = resultData.draft;
+    result.className = "";
+
+  } catch (error) {
+    result.textContent = "Error: " + error.message;
+    result.className = "";
+  }
+}
+
+async function copyDraft() {
+  const text = document.getElementById("result").textContent;
+
+  await navigator.clipboard.writeText(text);
+
+  alert("Draft copied!");
+}
+  </script>
+
+</body>
+</html>
